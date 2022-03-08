@@ -92,7 +92,37 @@ class DeveloperController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'first_name'=> 'required|string|max:191',
+            'last_name'=>'required|string|max:191',
+            'email'=>'required|email',
+            'phone_number'=>'required|digits:10',
+            'address'=>'required',
+            'photo'=> 'required',
+          ]);
+
+          $user_images = Developer::where('id', '=', $id)->get('photo');
+            if ($request['photo'] != $user_images[0]['photo']) {
+
+                if (file_exists('images/' . $user_images[0]['photo'])) {
+                    unlink('images/' . $user_images[0]['photo']);
+                }
+                $userImage = $request['photo'];
+        $userImage = time() . '.' . explode('/', explode(':', substr($request->photo, 0, strpos($request->photo, ';')))[1])[1];
+        $img = \Image::make($request->photo);
+        $img->save('images/' . $userImage);
+                Developer::where('id', '=', $id)
+                    ->update([
+                        'photo' => $userImage,
+                    ]);
+            }
+            Developer::where('id',$id)->update([
+                'first_name' => $request['first_name'],
+                'last_name' => $request['last_name'],
+                'email' => $request['email'],
+                'phone_number' => $request['phone_number'],
+                'address' => $request['address'],
+            ]);
     }
 
     /**
@@ -103,6 +133,9 @@ class DeveloperController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $developer  = Developer::findOrFail($id);
+        $developer->delete();
+
+        return ['message' => 'developer Deleted'];
     }
 }

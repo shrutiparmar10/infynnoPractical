@@ -10,6 +10,7 @@ class Developer extends Model
     use HasFactory;
     protected $table = "developers";
     protected $fillable=[
+        'id',
         'first_name',
         'last_name',
         'email',

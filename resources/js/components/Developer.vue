@@ -31,8 +31,9 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="developer in developers.data" :key="developer.id">
-                  <td><img src="/images/avatar-icon.jpg" height="80" width="80"></td>
+                <tr v-for="(developer,index) in developers" :key="developer.id">
+                  <td>{{index+1}}</td>
+                  <td><img :src="'/images/'+developer.photo" height="50" width="50"></td>
                   <td>{{developer.first_name}} {{developer.last_name}}</td>
                   <td>
                    {{developer.email}}
@@ -41,7 +42,7 @@
                    {{developer.phone_number}}
                   </td>
                   <td>{{developer.address}}</td>
-                  <td>action</td>
+                  <td><a style="color:blue" @click="editDeveloper(developer)">Edit</a>| <a style="color:red" @click="deleteDeveloper(developer.id)">Delete</a></td>
                 </tr>
               </tbody>
             </table>
@@ -66,6 +67,40 @@ export default {
             .then(({data})=>{
                 this.developers = data;
             }).catch((error)=>{});
+        },
+        deleteDeveloper(id){
+           Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Deleted it!",
+      }).then((result) => {
+        if (result.value) {
+          axios
+            .delete("developers/"+id)
+            .then(() => {
+              this.loadDeveloper();
+              alert("successfully Deleted");
+            })
+            .catch((error) => {
+              Swal.fire(
+                "Failed!",
+                "Can not be Deleted.",
+                "warning"
+              );
+            });
+        }
+      });
+        },
+        editDeveloper(developer)
+        {
+          this.$router.push({
+            name:"add-developer",
+            params:{developerDetails:developer}
+          });
         }
     },
 

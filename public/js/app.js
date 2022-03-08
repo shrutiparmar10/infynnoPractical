@@ -2221,6 +2221,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2235,6 +2236,37 @@ __webpack_require__.r(__webpack_exports__);
         var data = _ref.data;
         _this.developers = data;
       })["catch"](function (error) {});
+    },
+    deleteDeveloper: function deleteDeveloper(id) {
+      var _this2 = this;
+
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Deleted it!"
+      }).then(function (result) {
+        if (result.value) {
+          axios["delete"]("developers/" + id).then(function () {
+            _this2.loadDeveloper();
+
+            alert("successfully Deleted");
+          })["catch"](function (error) {
+            Swal.fire("Failed!", "Can not be Deleted.", "warning");
+          });
+        }
+      });
+    },
+    editDeveloper: function editDeveloper(developer) {
+      this.$router.push({
+        name: "add-developer",
+        params: {
+          developerDetails: developer
+        }
+      });
     }
   },
   created: function created() {
@@ -2394,9 +2426,28 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
+      developers: this.$route.params.developerDetails,
       editMode: false,
       form: new Form({
         first_name: "",
@@ -2432,8 +2483,29 @@ __webpack_require__.r(__webpack_exports__);
       var photo = this.form.photo.length > 200 ? this.form.photo : "images/" + this.form.photo;
       return photo;
     },
-    createDeveloper: function createDeveloper() {
+    updateDeveloper: function updateDeveloper() {
       var _this2 = this;
+
+      axios.put("developers/" + this.developers.id, {
+        first_name: this.form.first_name,
+        last_name: this.form.last_name,
+        email: this.form.email,
+        phone_number: this.form.phone_number,
+        address: this.form.address,
+        photo: this.form.photo
+      }).then(function (response) {
+        alert("Developer Updated successfully");
+
+        _this2.$router.push({
+          name: 'developer'
+        });
+      })["catch"](function (error) {
+        _this2.feedback = error.response.data.errors;
+        alert("your Request Failed.");
+      });
+    },
+    createDeveloper: function createDeveloper() {
+      var _this3 = this;
 
       axios.post("developers", {
         first_name: this.form.first_name,
@@ -2443,26 +2515,30 @@ __webpack_require__.r(__webpack_exports__);
         address: this.form.address,
         photo: this.form.photo
       }).then(function (response) {
-        if (response.data == "failed") {//   this.toast.$emit("ToastError", "your Request Failed.");
-        } else {
-          //   this.toast.$emit("ToastSuccess", "Developer Added successfully");
-          _this2.loadDeveloper();
-        }
+        alert("Developer Added successfully");
+
+        _this3.$router.push({
+          name: 'developer'
+        });
       })["catch"](function (error) {
-        _this2.feedback = error.response.data.errors; // this.toast.$emit("ToastError", "your Request Failed.");
+        _this3.feedback = error.response.data.errors;
+        alert("your Request Failed.");
       });
     },
     loadDeveloper: function loadDeveloper() {
-      var _this3 = this;
-
-      axios.get("developers").then(function (_ref) {
-        var data = _ref.data;
-        _this3.developers = data;
-      })["catch"](function (error) {});
+      this.editMode = true;
+      this.form.fill(this.developers);
     }
   },
   created: function created() {
-    this.loadDeveloper();
+    if (this.developers != null) {
+      this.loadDeveloper();
+    } // else{
+    //   this.$router.push({
+    //             name: "add-developer"
+    //   });
+    // }
+
   }
 });
 
@@ -6488,9 +6564,19 @@ var render = function () {
               _vm._v(" "),
               _c(
                 "tbody",
-                _vm._l(_vm.developers.data, function (developer) {
+                _vm._l(_vm.developers, function (developer, index) {
                   return _c("tr", { key: developer.id }, [
-                    _vm._m(2, true),
+                    _c("td", [_vm._v(_vm._s(index + 1))]),
+                    _vm._v(" "),
+                    _c("td", [
+                      _c("img", {
+                        attrs: {
+                          src: "/images/" + developer.photo,
+                          height: "50",
+                          width: "50",
+                        },
+                      }),
+                    ]),
                     _vm._v(" "),
                     _c("td", [
                       _vm._v(
@@ -6518,7 +6604,33 @@ var render = function () {
                     _vm._v(" "),
                     _c("td", [_vm._v(_vm._s(developer.address))]),
                     _vm._v(" "),
-                    _c("td", [_vm._v("action")]),
+                    _c("td", [
+                      _c(
+                        "a",
+                        {
+                          staticStyle: { color: "blue" },
+                          on: {
+                            click: function ($event) {
+                              return _vm.editDeveloper(developer)
+                            },
+                          },
+                        },
+                        [_vm._v("Edit")]
+                      ),
+                      _vm._v("| "),
+                      _c(
+                        "a",
+                        {
+                          staticStyle: { color: "red" },
+                          on: {
+                            click: function ($event) {
+                              return _vm.deleteDeveloper(developer.id)
+                            },
+                          },
+                        },
+                        [_vm._v("Delete")]
+                      ),
+                    ]),
                   ])
                 }),
                 0
@@ -6559,16 +6671,6 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Action")]),
       ]),
-    ])
-  },
-  function () {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", [
-      _c("img", {
-        attrs: { src: "/images/avatar-icon.jpg", height: "80", width: "80" },
-      }),
     ])
   },
 ]
@@ -6657,6 +6759,17 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _vm.feedback.first_name
+                      ? _c("div", [
+                          _c("span", {
+                            staticStyle: { color: "red" },
+                            domProps: {
+                              textContent: _vm._s(_vm.feedback.first_name[0]),
+                            },
+                          }),
+                        ])
+                      : _vm._e(),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "col-md-6 form-group" }, [
@@ -6689,6 +6802,17 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _vm.feedback.last_name
+                      ? _c("div", [
+                          _c("span", {
+                            staticStyle: { color: "red" },
+                            domProps: {
+                              textContent: _vm._s(_vm.feedback.last_name[0]),
+                            },
+                          }),
+                        ])
+                      : _vm._e(),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "col-md-6 form-group" }, [
@@ -6721,6 +6845,17 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _vm.feedback.email
+                      ? _c("div", [
+                          _c("span", {
+                            staticStyle: { color: "red" },
+                            domProps: {
+                              textContent: _vm._s(_vm.feedback.email[0]),
+                            },
+                          }),
+                        ])
+                      : _vm._e(),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "col-md-6 form-group" }, [
@@ -6757,6 +6892,17 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _vm.feedback.phone_number
+                      ? _c("div", [
+                          _c("span", {
+                            staticStyle: { color: "red" },
+                            domProps: {
+                              textContent: _vm._s(_vm.feedback.phone_number[0]),
+                            },
+                          }),
+                        ])
+                      : _vm._e(),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "col-md-12 form-group" }, [
@@ -6789,6 +6935,17 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _vm.feedback.address
+                      ? _c("div", [
+                          _c("span", {
+                            staticStyle: { color: "red" },
+                            domProps: {
+                              textContent: _vm._s(_vm.feedback.address[0]),
+                            },
+                          }),
+                        ])
+                      : _vm._e(),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group" }, [
@@ -6870,7 +7027,18 @@ var render = function () {
                         ]
                       ),
                       _vm._v(" "),
-                      _c("p", [_vm._v("Allowed JPG, GIF or PNG.")]),
+                      _c("p", [_vm._v("Allowed JPG, JPEG or PNG.")]),
+                      _vm._v(" "),
+                      _vm.feedback.photo
+                        ? _c("div", [
+                            _c("span", {
+                              staticStyle: { color: "red" },
+                              domProps: {
+                                textContent: _vm._s(_vm.feedback.photo[0]),
+                              },
+                            }),
+                          ])
+                        : _vm._e(),
                     ]),
                   ]),
                 ]),

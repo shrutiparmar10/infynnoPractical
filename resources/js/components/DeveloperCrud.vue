@@ -24,6 +24,9 @@
                     id="fname"
                     placeholder="Enter First Name"
                   />
+                  <div v-if="feedback.first_name">
+                    <span style="color:red" v-text="feedback.first_name[0]" />
+                    </div>
                 </div>
                 <div class="col-md-6 form-group">
                   <label for="lname">Last Name</label>
@@ -34,6 +37,9 @@
                     id="lname"
                     placeholder="Enter Last Name"
                   />
+                  <div v-if="feedback.last_name">
+                    <span style="color:red" v-text="feedback.last_name[0]" />
+                    </div>
                 </div>
                 <div class="col-md-6 form-group">
                   <label for="exampleInputEmail1">Email address</label>
@@ -44,6 +50,9 @@
                     id="exampleInputEmail1"
                     placeholder="Enter email"
                   />
+                  <div v-if="feedback.email">
+                    <span style="color:red" v-text="feedback.email[0]" />
+                    </div>
                 </div>
                 <div class="col-md-6 form-group">
                   <label for="phone">Phone Number</label>
@@ -54,6 +63,9 @@
                     id="phone"
                     placeholder="Enter Phone"
                   />
+                  <div v-if="feedback.phone_number">
+                    <span style="color:red" v-text="feedback.phone_number[0]" />
+                    </div>
                 </div>
                 <div class="col-md-12 form-group">
                   <label for="address">Address</label>
@@ -64,6 +76,9 @@
                     id="address"
                     placeholder="Enter Address"
                   />
+                   <div v-if="feedback.address">
+                    <span style="color:red" v-text="feedback.address[0]" />
+                    </div>
                 </div>
                 <div class="form-group">
                   <div class="media">
@@ -115,7 +130,10 @@
                     >
                       Reset
                     </button>
-                    <p>Allowed JPG, GIF or PNG.</p>
+                    <p>Allowed JPG, JPEG or PNG.</p>
+                    <div v-if="feedback.photo">
+                    <span style="color:red" v-text="feedback.photo[0]" />
+                    </div>
                   </div>
                   <!--/ upload and reset button -->
                 </div>
@@ -141,7 +159,7 @@
 export default {
   data() {
     return {
-     
+     developers:this.$route.params.developerDetails,
       editMode: false,
       form: new Form({
           first_name:"",
@@ -176,6 +194,28 @@ export default {
           : "images/" + this.form.photo;
       return photo;
     },
+    updateDeveloper(){
+      axios
+        .put("developers/" + this.developers.id, {
+          first_name:this.form.first_name,
+          last_name:this.form.last_name,
+          email:this.form.email,
+          phone_number:this.form.phone_number,
+          address:this.form.address,
+         photo: this.form.photo,
+        })
+         .then((response) => {
+           
+            alert("Developer Updated successfully");
+              this.$router.push({
+                name:'developer'
+              });
+          })
+          .catch((error) => {
+            this.feedback = error.response.data.errors;
+            alert("your Request Failed.");
+          });
+    },
     createDeveloper(){
         axios
         .post("developers",{
@@ -187,31 +227,34 @@ export default {
          photo: this.form.photo,
         })
          .then((response) => {
-            if (response.data == "failed") {
-            //   this.toast.$emit("ToastError", "your Request Failed.");
-            } else {
-            //   this.toast.$emit("ToastSuccess", "Developer Added successfully");
-              this.loadDeveloper();
+            
+            alert("Developer Added successfully");
+              this.$router.push({
+                name:'developer'
+              });
               
-            }
+            
           })
           .catch((error) => {
             this.feedback = error.response.data.errors;
-            // this.toast.$emit("ToastError", "your Request Failed.");
+            alert("your Request Failed.");
           });
     },
     loadDeveloper() {
-      axios
-        .get("developers")
-        .then(({ data }) => {
-          this.developers = data;
-        })
-        .catch((error) => {});
+      this.editMode = true;
+      this.form.fill(this.developers);
     },
   },
 
   created() {
-    this.loadDeveloper();
+    if (this.developers != null) {
+      this.loadDeveloper();
+    }
+    // else{
+    //   this.$router.push({
+    //             name: "add-developer"
+    //   });
+    // }
   },
 };
 </script>
