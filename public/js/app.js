@@ -2222,10 +2222,24 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
-      developers: {}
+      developers: {},
+      selected: []
     };
   },
   methods: {
@@ -2259,6 +2273,25 @@ __webpack_require__.r(__webpack_exports__);
           });
         }
       });
+    },
+    deleteMultiple: function deleteMultiple() {
+      var _this3 = this;
+
+      if (this.selected.length == 0) {
+        alert("No developer Selected");
+      } else {
+        axios["delete"]("multiDeleteDeveloper", {
+          params: {
+            id: this.selected
+          }
+        }).then(function (response) {
+          alert("Selected Developer Deleted successfully");
+
+          _this3.loadDeveloper();
+        })["catch"](function (error) {
+          alert("Selected Developer Could Not Be Deleted");
+        });
+      }
     },
     editDeveloper: function editDeveloper(developer) {
       this.$router.push({
@@ -6546,6 +6579,27 @@ var render = function () {
               "div",
               { staticStyle: { "text-align": "right" } },
               [
+                _c(
+                  "button",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.developers,
+                        expression: "developers",
+                      },
+                    ],
+                    staticClass: "btn btn-danger",
+                    on: { click: _vm.deleteMultiple },
+                  },
+                  [
+                    _vm._v(
+                      "\n                  Delete Selected\n              "
+                    ),
+                  ]
+                ),
+                _vm._v(" "),
                 _c("router-link", { attrs: { to: "/add-developer" } }, [
                   _c("button", { staticClass: "btn btn-success" }, [
                     _vm._v(
@@ -6566,6 +6620,51 @@ var render = function () {
                 "tbody",
                 _vm._l(_vm.developers, function (developer, index) {
                   return _c("tr", { key: developer.id }, [
+                    _c("td", [
+                      _c("div", { staticClass: "pretty p-icon" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.selected,
+                              expression: "selected",
+                            },
+                          ],
+                          attrs: { type: "checkbox" },
+                          domProps: {
+                            value: developer.id,
+                            checked: Array.isArray(_vm.selected)
+                              ? _vm._i(_vm.selected, developer.id) > -1
+                              : _vm.selected,
+                          },
+                          on: {
+                            change: function ($event) {
+                              var $$a = _vm.selected,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = developer.id,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 && (_vm.selected = $$a.concat([$$v]))
+                                } else {
+                                  $$i > -1 &&
+                                    (_vm.selected = $$a
+                                      .slice(0, $$i)
+                                      .concat($$a.slice($$i + 1)))
+                                }
+                              } else {
+                                _vm.selected = $$c
+                              }
+                            },
+                          },
+                        }),
+                        _vm._v(" "),
+                        _vm._m(2, true),
+                      ]),
+                    ]),
+                    _vm._v(" "),
                     _c("td", [_vm._v(_vm._s(index + 1))]),
                     _vm._v(" "),
                     _c("td", [
@@ -6657,6 +6756,8 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", [
+        _c("th", { staticStyle: { width: "10px" } }),
+        _vm._v(" "),
         _c("th", { staticStyle: { width: "10px" } }, [_vm._v("#")]),
         _vm._v(" "),
         _c("th", [_vm._v("Image")]),
@@ -6671,6 +6772,16 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Action")]),
       ]),
+    ])
+  },
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "state" }, [
+      _c("i", { staticClass: "icon fa fa-check" }),
+      _vm._v(" "),
+      _c("label"),
     ])
   },
 ]

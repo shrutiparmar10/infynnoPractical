@@ -20,6 +20,7 @@ Route::get('/', function () {
 
 Auth::routes();
 Route::apiResources(['developers'=>DeveloperController::class]);
+Route::delete('multiDeleteDeveloper',[DeveloperController::class,'multiDeleteDeveloper']);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 

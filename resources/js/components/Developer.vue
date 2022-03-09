@@ -9,6 +9,9 @@
           <div class="card-header">
             <h3 class="card-title">Developer List</h3>
             <div style="text-align:right">
+              <button v-show="developers" class="btn btn-danger" @click="deleteMultiple">
+                    Delete Selected
+                </button>
                 <router-link to="/add-developer">
                 <button class="btn btn-success">
                     Add New Developer
@@ -21,6 +24,7 @@
             <table class="table table-striped">
               <thead>
                 <tr>
+                  <th style="width: 10px"></th>
                   <th style="width: 10px">#</th>
                   <th>Image</th>
                   <th>Name</th>
@@ -32,6 +36,15 @@
               </thead>
               <tbody>
                 <tr v-for="(developer,index) in developers" :key="developer.id">
+                  <td>
+                        <div class="pretty p-icon">
+                        <input type="checkbox" :value="developer.id" v-model="selected" />
+                        <div class="state">
+                            <i class="icon fa fa-check"></i>
+                            <label></label>
+                        </div>
+                        </div>
+                    </td>
                   <td>{{index+1}}</td>
                   <td><img :src="'/images/'+developer.photo" height="50" width="50"></td>
                   <td>{{developer.first_name}} {{developer.last_name}}</td>
@@ -57,7 +70,8 @@
 export default {
     data(){
         return{
-            developers:{}
+            developers:{},
+            selected:[],
         }
     },
     methods:{
@@ -94,6 +108,21 @@ export default {
             });
         }
       });
+        },
+        deleteMultiple(){
+          if (this.selected.length == 0) {
+        alert("No developer Selected");
+      } else {
+        axios
+          .delete("multiDeleteDeveloper", { params: { id: this.selected } })
+          .then(response => {
+            alert("Selected Developer Deleted successfully");
+            this.loadDeveloper();
+          })
+          .catch(error => {
+            alert("Selected Developer Could Not Be Deleted");
+          });
+      }
         },
         editDeveloper(developer)
         {

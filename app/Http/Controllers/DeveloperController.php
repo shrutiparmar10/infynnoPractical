@@ -138,4 +138,16 @@ class DeveloperController extends Controller
 
         return ['message' => 'developer Deleted'];
     }
+
+    public function multiDeleteDeveloper(Request $request)
+    {
+        try{
+            Developer::whereIn('id',$request['id'])->delete();
+            return ["message"=> 'Selected Developer Deleted'];
+        }
+        catch(Exception $e)
+        {
+            return ["message"=> 'Not Developer Deleted'];
+        }
+    }
 }
